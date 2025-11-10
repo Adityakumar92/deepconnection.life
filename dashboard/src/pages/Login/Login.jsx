@@ -29,12 +29,13 @@ export default function Login() {
       setLoading(true);
 
       // ✅ Call your backend API using axios instance
-      const { data } = await api.post("/api/auth/login", formData);
+      const { data } = await api.post("/api/admin/auth/login", formData);
 
       // ✅ If login successful
       toast.success("Login successful!");
       localStorage.setItem("token", data.token);
-      navigate("/dashboard");
+      localStorage.setItem("user", JSON.stringify(data.user));
+      navigate("/");
 
     } catch (error) {
       // ✅ Handle error properly
