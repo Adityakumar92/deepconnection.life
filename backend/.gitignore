@@ -28,53 +28,53 @@ coverage/
 .next/
 out/
 
-# OS generated files
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Icon?
-Desktop.ini
+# # OS generated files
+# .DS_Store
+# Thumbs.db
+# ehthumbs.db
+# Icon?
+# Desktop.ini
 
-# IDE / Editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.swn
-*.bak
-*.tmp
+# # IDE / Editor files
+# .vscode/
+# .idea/
+# *.swp
+# *.swo
+# *.swn
+# *.bak
+# *.tmp
 
-# Optional lock files (uncomment based on preference)
+# # Optional lock files (uncomment based on preference)
 package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# yarn.lock
+# pnpm-lock.yaml
 
-# Debug folders
-npm-debug.log
-yarn-debug.log
-node-inspect.json
+# # Debug folders
+# npm-debug.log
+# yarn-debug.log
+# node-inspect.json
 
-# PM2 logs and configs
-.pids
-*.pid
-*.seed
-*.pid.lock
+# # PM2 logs and configs
+# .pids
+# *.pid
+# *.seed
+# *.pid.lock
 
-# Testing
-coverage/
-.nyc_output/
+# # Testing
+# coverage/
+# .nyc_output/
 
-# Uploads (if applicable — only ignore if not needed in repo)
-uploads/
-public/uploads/
-temp/
-tmp/
+# # Uploads (if applicable — only ignore if not needed in repo)
+# uploads/
+# public/uploads/
+# temp/
+# tmp/
 
-# Mongoose / MongoDB dump files
-*.bson
-*.json
-dump/
+# # Mongoose / MongoDB dump files
+# *.bson
+# *.json
+# dump/
 
-# Environment-specific
-.env.*
-*.local
+# # Environment-specific
+# .env.*
+# *.local
