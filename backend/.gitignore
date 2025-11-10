@@ -45,9 +45,9 @@ Desktop.ini
 *.tmp
 
 # Optional lock files (uncomment based on preference)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # Debug folders
 npm-debug.log
