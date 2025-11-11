@@ -7,12 +7,6 @@ export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    navigate("/login");
-    return null; // Prevent rendering until navigation occurs
-  }
-
   return (
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
       {/* ✅ Sticky Header */}
