@@ -3,7 +3,7 @@ const BackendUser = require('../../models/backendUser/backendUser.model');
 
 const createRoleAndPermission = async (req, res) => {
     try {
-      const { role, dashboard, bookingManagement, blogManagement, contactUsManagement } = req.body;
+      const { role, dashboard, bookingManagement, blogManagement, contactUsManagement, backendUserManagement, roleAndPermissionManagement } = req.body;
   
       if (!role || !role.trim()) {
         return res.status(400).json({ success: false, message: 'Role name is required' });
@@ -28,6 +28,8 @@ const createRoleAndPermission = async (req, res) => {
       const bookingManagementValue = validatePermission(bookingManagement, 'bookingManagement');
       const blogManagementValue = validatePermission(blogManagement, 'blogManagement');
       const contactUsManagementValue = validatePermission(contactUsManagement, 'contactUsManagement');
+      const backendUserManagementValue = validatePermission(backendUserManagement, 'backendUserManagement');
+      const roleAndPermissionManagementValue = validatePermission(roleAndPermissionManagement, 'roleAndPermissionManagement');
   
       // ✅ Create new role
       const newRolePermission = new RoleAndPermission({
@@ -35,7 +37,9 @@ const createRoleAndPermission = async (req, res) => {
         dashboard: dashboardValue,
         bookingManagement: bookingManagementValue,
         blogManagement: blogManagementValue,
-        contactUsManagement: contactUsManagementValue
+        contactUsManagement: contactUsManagementValue,
+        backendUserManagement: backendUserManagementValue,
+        roleAndPermissionManagement: roleAndPermissionManagementValue
       });
   
       const savedRole = await newRolePermission.save();
@@ -121,7 +125,7 @@ const getRolePermissionById = async (req, res) => {
 const updateRolePermissionById = async (req, res) => {
     try {
         const { id } = req.params;
-        const { role, dashboard, bookingManagement, blogManagement, contactUsManagement } = req.body;
+        const { role, dashboard, bookingManagement, blogManagement, contactUsManagement, backendUserManagement, roleAndPermissionManagement } = req.body;
 
         const existingRole = await RoleAndPermission.findById(id);
         if (!existingRole) {
@@ -155,7 +159,9 @@ const updateRolePermissionById = async (req, res) => {
                 dashboard: validatePermission(dashboard, 'dashboard', existingRole.dashboard),
                 bookingManagement: validatePermission(bookingManagement, 'bookingManagement', existingRole.bookingManagement),
                 blogManagement: validatePermission(blogManagement, 'blogManagement', existingRole.blogManagement),
-                contactUsManagement: validatePermission(contactUsManagement, 'contactUsManagement', existingRole.contactUsManagement)
+                contactUsManagement: validatePermission(contactUsManagement, 'contactUsManagement', existingRole.contactUsManagement),
+                backendUserManagement: validatePermission(backendUserManagement, 'backendUserManagement', existingRole.backendUserManagement),
+                roleAndPermissionManagement: validatePermission(roleAndPermissionManagement, 'roleAndPermissionManagement', existingRole.roleAndPermissionManagement)
             };
 
             const updatedRole = await RoleAndPermission.findByIdAndUpdate(
