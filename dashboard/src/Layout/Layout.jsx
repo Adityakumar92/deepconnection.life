@@ -7,32 +7,34 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Header */}
-      <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
+      {/* ✅ Sticky Header */}
+      <header className="sticky top-0 z-50 bg-white shadow-sm">
+        <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      </header>
 
-      {/* Main content area */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-[20%_80%]">
-        {/* Sidebar */}
-        <div className="md:block hidden border-r border-gray-200 bg-white">
+      {/* ✅ Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* ✅ Sidebar (scrolls independently) */}
+        <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar">
           <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        </div>
+        </aside>
 
-        {/* Sidebar (mobile) */}
+        {/* ✅ Mobile Sidebar Drawer */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div
               className="absolute inset-0 bg-black/50"
               onClick={() => setSidebarOpen(false)}
             />
-            <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-lg">
+            <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-lg overflow-y-auto custom-scrollbar">
               <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
             </div>
           </div>
         )}
 
-        {/* Page content */}
-        <main className="p-6 overflow-y-auto bg-gray-50">
+        {/* ✅ Main Outlet (scrolls independently) */}
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <Outlet />
         </main>
       </div>

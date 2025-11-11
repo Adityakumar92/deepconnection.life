@@ -32,7 +32,7 @@ export default function Login() {
       const { data } = await api.post("/api/admin/auth/login", formData);
 
       // ✅ If login successful
-      toast.success("Login successful!");
+      toast.success(data?.message || "Login successful!");
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/");
