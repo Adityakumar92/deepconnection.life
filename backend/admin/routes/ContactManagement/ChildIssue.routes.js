@@ -6,7 +6,7 @@ const {
     getChildIssueById,
     updateChildIssueById,
     deleteChildIssueById
-} = require('../../controllers/ContactManagement/childIssue.controller');
+} = require('../../controllers/ContactManagement/ChildIssue.controller');
 
 router.post('/', createChildIssue);
 router.get('/', getAllChildIssues);

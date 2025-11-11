@@ -76,5 +76,5 @@ package-lock.json
 # dump/
 
 # # Environment-specific
-# .env.*
+.env
 # *.local
