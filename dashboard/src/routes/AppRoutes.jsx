@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Layout from "../Layout/Layout";
 import Dashboard from "../pages/Dashboard/Dashboard";
@@ -7,13 +7,18 @@ import RoleManagement from "../pages/RoleManagement/RoleMAnagement.jsx";
 import Login from "../pages/Login/Login";
 
 const router = createBrowserRouter([
+    // ✅ Root route decides where to go
+    {
+        path: "/",
+        element: <RootRedirect />,
+    },
     {
         path: '/',
-        element: <Layout/>,
-        children : [
+        element: <Layout />,
+        children: [
             {
                 path: 'dashboard/',
-                element:(
+                element: (
                     <ProtectedRoute moduleKey="dashboard">
                         <Dashboard />
                     </ProtectedRoute>
@@ -58,9 +63,18 @@ const router = createBrowserRouter([
         ]
     },
     {
-        path : '/login',
+        path: '/login',
         element: <Login />
     }
 ])
+
+// ✅ Root redirector component
+function RootRedirect() {
+    const authData = localStorage.getItem("authData");
+    const token = authData ? JSON.parse(authData).token : null;
+
+    // if logged in, go to dashboard else login
+    return token ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
+}
 
 export default router;

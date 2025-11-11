@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { img } from "../assets/img";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/authSlice";
 
 function Header() {
   const navigate = useNavigate();
-  const [name, setName] = useState("User");
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const [name, setName] = useState(user?.name || "User");
 
+  // ✅ Load user name from Redux or localStorage on mount
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setName(user.name || "User");
+    if (user?.name) {
+      setName(user.name);
+    } else {
+      const savedData = localStorage.getItem("authData");
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        setName(parsed?.user?.name || "User");
       }
-    } catch (error) {
-      console.error("Failed to parse user data:", error);
     }
-  }, []);
+  }, [user]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
+    dispatch(logout());
+    navigate("/login", { replace: true });
   };
 
   return (
