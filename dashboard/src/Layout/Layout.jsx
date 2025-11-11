@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import Header from "../components/Header";
@@ -6,6 +6,13 @@ import Header from "../components/Header";
 export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (!token) {
+    navigate("/login");
+    }
+  }, [token, navigate]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
