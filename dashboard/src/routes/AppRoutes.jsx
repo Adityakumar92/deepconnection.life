@@ -4,7 +4,6 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import Layout from "../Layout/Layout";
 import RoleMAnagement from "../pages/RoleManagement/RoleMAnagement";
 import BackendUser from "../pages/RoleManagement/BackendUser";
-import ProtecctedRoute from "./ProtectedRoute";
 
 
 const router = createBrowserRouter([
