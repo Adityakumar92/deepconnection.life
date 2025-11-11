@@ -3,7 +3,7 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import Layout from "../Layout/Layout";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import BackendUser from "../pages/RoleManagement/BackendUser";
-import RoleManagement from "../pages/RoleManagement/RoleManagement";
+import RoleManagement from "../pages/RoleManagement/RoleMAnagement.jsx";
 import Login from "../pages/Login/Login";
 
 const router = createBrowserRouter([
