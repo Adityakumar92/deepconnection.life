@@ -17,9 +17,9 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
 
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
+      const authData = localStorage.getItem("authData");
+      if (authData) {
+        const user = JSON.parse(authData).user;
         setRole(user.role || "Admin");
       }
     } catch (error) {

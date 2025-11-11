@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/api";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/authSlice";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,36 +18,37 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { email, password } = formData;
+  useEffect(() => {
+    const authData = localStorage.getItem("authData");
+    const token = authData ? JSON.parse(authData).token : null;
 
-    if (!email || !password) {
-      toast.error("Please fill in all fields");
-      return;
+    if (token) {
+      navigate("/dashboard", { replace: true });
     }
+  }, [navigate]);
 
-    try {
-      setLoading(true);
 
-      // ✅ Call your backend API using axios instance
-      const { data } = await api.post("/api/admin/auth/login", formData);
+  const dispatch = useDispatch();
 
-      // ✅ If login successful
-      toast.success(data?.message || "Login successful!");
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      navigate("/");
-
-    } catch (error) {
-      // ✅ Handle error properly
-      const message =
-        error.response?.data?.message || "Invalid email or password";
-      toast.error(message);
-    } finally {
-      setLoading(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const { data } = await api.post("/api/admin/auth/login", formData);
+    if (data.success) {
+      dispatch(
+        login({
+          token: data.token,
+          user: data.user,
+          roleAndPermission: data.roleAndPermission,
+        })
+      );
+      toast.success("Login successful");
+      navigate("/dashboard", { replace: true });
     }
-  };
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Invalid credentials");
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4">

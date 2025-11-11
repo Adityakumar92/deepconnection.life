@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import Header from "../components/Header";
 
 export default function Layout() {
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const token = localStorage.getItem("token");
-  useEffect(() => {
-    if (!token) {
-    navigate("/login");
-    }
-  }, [token, navigate]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden">
@@ -23,12 +15,12 @@ export default function Layout() {
 
       {/* ✅ Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* ✅ Sidebar (scrolls independently) */}
+        {/* ✅ Sidebar (Desktop) */}
         <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar">
           <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         </aside>
 
-        {/* ✅ Mobile Sidebar Drawer */}
+        {/* ✅ Sidebar (Mobile Drawer) */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div
@@ -41,7 +33,7 @@ export default function Layout() {
           </div>
         )}
 
-        {/* ✅ Main Outlet (scrolls independently) */}
+        {/* ✅ Main Content Area */}
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
           <Outlet />
         </main>

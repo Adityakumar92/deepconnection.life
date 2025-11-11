@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
-import Login from "../pages/Login/Login";
-import Dashboard from "../pages/Dashboard/Dashboard";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 import Layout from "../Layout/Layout";
-import RoleMAnagement from "../pages/RoleManagement/RoleMAnagement";
+import Dashboard from "../pages/Dashboard/Dashboard";
 import BackendUser from "../pages/RoleManagement/BackendUser";
-
+import RoleManagement from "../pages/RoleManagement/RoleManagement";
+import Login from "../pages/Login/Login";
 
 const router = createBrowserRouter([
     {
@@ -13,7 +13,11 @@ const router = createBrowserRouter([
         children : [
             {
                 path: 'dashboard/',
-                element: <Dashboard />
+                element:(
+                    <ProtectedRoute moduleKey="dashboard">
+                        <Dashboard />
+                    </ProtectedRoute>
+                )
             },
             {
                 path: 'blogs/',
@@ -45,7 +49,7 @@ const router = createBrowserRouter([
             },
             {
                 path: 'roles/',
-                element: <RoleMAnagement />
+                element: <RoleManagement />
             },
             {
                 path: 'backendUsers/',
