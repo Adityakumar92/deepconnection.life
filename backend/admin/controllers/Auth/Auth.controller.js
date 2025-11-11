@@ -32,7 +32,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Optional: Check if user is blocked
     if (user.block) {
       return res.status(403).json({
         success: false,

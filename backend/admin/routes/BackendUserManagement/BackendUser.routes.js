@@ -11,7 +11,7 @@ const {
 
 router.post('/', createBackendUser);
 
-router.get('/', getAllBackendUsers);
+router.post('/all', getAllBackendUsers);
 
 router.get('/:id', getBackendUserById);
 

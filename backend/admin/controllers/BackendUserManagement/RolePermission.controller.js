@@ -67,19 +67,34 @@ const createRoleAndPermission = async (req, res) => {
 
 
 const getAllRolePermissions = async (req, res) => {
-    try {
-        const roles = await RoleAndPermission.find();
+  try {
+    const { role } = req?.body || ''; // 🔹 Accept filter from req.body
 
-        res.status(200).json({
-            success: true,
-            message: 'Roles fetched successfully',
-            roles
-        });
-    } catch (error) {
-        console.error('Error fetching roles:', error);
-        res.status(500).json({ success: false, message: 'Server error while fetching roles' });
+    // ✅ Build dynamic filter
+    const filter = {};
+    if (role && role.trim()) {
+      filter.role = { $regex: role.trim(), $options: "i" }; // case-insensitive search
     }
+
+    // ✅ Fetch roles with optional filtering
+    const roles = await RoleAndPermission.find(filter).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Roles fetched successfully",
+      total: roles.length,
+      roles,
+    });
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching roles",
+      error: error.message,
+    });
+  }
 };
+
 
 
 const getRolePermissionById = async (req, res) => {

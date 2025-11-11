@@ -75,26 +75,62 @@ const createBackendUser = async (req, res) => {
  */
 const getAllBackendUsers = async (req, res) => {
   try {
-    const users = await BackendUser.find()
-      .populate('roleAndPermissionModel', 'role dashboard bookingManagement blogManagement contactUsManagement')
-      .select('-password')
+    const { name, email, phone, role, block } = req.body;
+
+    // ✅ Build dynamic filter object
+    const filter = {};
+
+    // 🔍 Regex-based matching (case-insensitive)
+    if (name) filter.name = { $regex: name, $options: "i" };
+    if (email) filter.email = { $regex: email, $options: "i" };
+    if (phone) filter.phone = { $regex: phone, $options: "i" };
+
+    // 🧩 Match by block status if provided
+    if (block !== undefined) {
+      filter.block = block === "true" || block === true;
+    }
+
+    // 🧩 Role-based filtering (joins through populate)
+    let roleFilter = {};
+    if (role) {
+      roleFilter = { role: { $regex: role, $options: "i" } };
+    }
+
+    // ✅ Fetch users with filters
+    const users = await BackendUser.find(filter)
+      .populate({
+        path: "roleAndPermissionModel",
+        match: roleFilter, // role filter applies here
+        select:
+          "role dashboard bookingManagement blogManagement contactUsManagement",
+      })
+      .select("-password")
       .sort({ createdAt: -1 });
+
+    // 🧹 Remove users with null role after populate + filter
+    const filteredUsers = users.filter((user) => {
+      if (role) {
+        return user.roleAndPermissionModel !== null;
+      }
+      return true;
+    });
 
     res.status(200).json({
       success: true,
-      message: 'All backend users fetched successfully',
-      total: users.length,
-      users
+      message: "Backend users fetched successfully",
+      total: filteredUsers.length,
+      users: filteredUsers,
     });
   } catch (error) {
-    console.error('Error fetching backend users:', error);
+    console.error("Error fetching backend users:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching backend users',
-      error: error.message
+      message: "Server error while fetching backend users",
+      error: error.message,
     });
   }
 };
+
 
 /**
  * ✅ Get backend user by ID

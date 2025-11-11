@@ -5,13 +5,13 @@ const Suggestion = require('../../models/suggestion/suggestion.model');
  */
 const createSuggestion = async (req, res) => {
     try {
-        const { name, email, description } = req.body;
+        const { name, email, topic } = req.body;
 
         // Validate inputs
-        if (!name || !email || !description) {
+        if (!name || !email || !topic) {
             return res.status(400).json({
                 success: false,
-                message: 'All fields (name, email, description) are required'
+                message: 'All fields (name, email, topic) are required'
             });
         }
 
@@ -28,7 +28,7 @@ const createSuggestion = async (req, res) => {
         const newSuggestion = new Suggestion({
             name: name.trim(),
             email: email.trim(),
-            description: description.trim()
+            topic: topic.trim()
         });
 
         const savedSuggestion = await newSuggestion.save();
@@ -105,7 +105,7 @@ const getSuggestionById = async (req, res) => {
 const updateSuggestionById = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, description } = req.body;
+        const { name, email, topic } = req.body;
 
         const suggestion = await Suggestion.findById(id);
         if (!suggestion) {
@@ -128,7 +128,7 @@ const updateSuggestionById = async (req, res) => {
 
         suggestion.name = name?.trim() || suggestion.name;
         suggestion.email = email?.trim() || suggestion.email;
-        suggestion.description = description?.trim() || suggestion.description;
+        suggestion.topic = topic?.trim() || suggestion.topic;
 
         const updatedSuggestion = await suggestion.save();
 

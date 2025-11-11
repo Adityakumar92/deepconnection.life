@@ -9,7 +9,7 @@ const {
 } = require('../../controllers/BackendUserManagement/RolePermission.controller');
 
 router.post('/', createRoleAndPermission);
-router.get('/', getAllRolePermissions);
+router.post('/all', getAllRolePermissions);
 router.get('/:id', getRolePermissionById);
 router.patch('/:id', updateRolePermissionById);
 router.delete('/:id', deleteRolePermissionById);
