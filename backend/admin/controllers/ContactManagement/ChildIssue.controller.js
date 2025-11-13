@@ -45,14 +45,37 @@ const createChildIssue = async (req, res) => {
  */
 const getAllChildIssues = async (req, res) => {
     try {
-        const childIssues = await ChildIssue.find().sort({ createdAt: -1 });
-
+        const { status, name, search } = req.body;
+    
+        const filters = {};
+    
+        // 🟢 Filter by active/inactive status
+        if (status !== undefined && status !== "") {
+          filters.status = status === "true" || status === true;
+        }
+    
+        // 🟢 Partial match for name
+        if (name) {
+          filters.name = { $regex: name.trim(), $options: "i" };
+        }
+    
+        // 🟢 Global search — matches across fields
+        if (search) {
+          filters.$or = [
+            { name: { $regex: search, $options: "i" } },
+          ];
+        }
+    
+        // 🟢 Fetch and sort by newest first
+        const services = await ChildIssue.find(filters).sort({ createdAt: -1 });
+    
         res.status(200).json({
-            success: true,
-            message: 'Child issues fetched successfully',
-            childIssues
+          success: true,
+          message: "Child Issue fetched successfully",
+          total: services.length,
+          services,
         });
-    } catch (error) {
+      } catch (error) {
         console.error('Error fetching child issues:', error);
         res.status(500).json({
             success: false,

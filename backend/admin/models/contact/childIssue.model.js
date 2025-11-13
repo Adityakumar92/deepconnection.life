@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const childIssueSchema = new mongoose.Schema({
-    issue: {
+    name: {
         type: String,
         required: true
     },

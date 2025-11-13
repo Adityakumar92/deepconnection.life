@@ -9,6 +9,8 @@ import BlogManagement from "../pages/BlogManagement/BlogManagement.jsx";
 import ProgramManagement from "../pages/BookingManagement/ProgramManagement.jsx";
 import ServiceManagement from "../pages/BookingManagement/ServiceManagement.jsx";
 import BookingManagement from "../pages/BookingManagement/BookingManagement.jsx";
+import ChildIssueManagement from "../pages/ContactManagement/ChildIssueManagement.jsx";
+import ContactManagement from "../pages/ContactManagement/ContactManagement.jsx";
 
 const router = createBrowserRouter([
     // ✅ Root route decides where to go
@@ -46,11 +48,11 @@ const router = createBrowserRouter([
             },
             {
                 path: 'contacts/',
-                element: <Dashboard />
+                element: <ContactManagement />
             },
             {
                 path: 'child-issues/',
-                element: <Dashboard />
+                element: <ChildIssueManagement />
             },
             {
                 path: 'suggestions/',

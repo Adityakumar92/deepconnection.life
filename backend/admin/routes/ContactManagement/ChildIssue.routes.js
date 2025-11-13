@@ -9,7 +9,7 @@ const {
 } = require('../../controllers/ContactManagement/ChildIssue.controller');
 
 router.post('/', createChildIssue);
-router.get('/', getAllChildIssues);
+router.post('/all', getAllChildIssues);
 router.get('/:id', getChildIssueById);
 router.patch('/:id', updateChildIssueById);
 router.delete('/:id', deleteChildIssueById);

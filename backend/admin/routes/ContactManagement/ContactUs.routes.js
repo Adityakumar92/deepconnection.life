@@ -10,7 +10,7 @@ const {
 
 
 router.post('/', createContact);
-router.get('/', getAllContacts);
+router.post('/all', getAllContacts);
 router.get('/:id', getContactById);
 router.patch('/:id', updateContactById);
 router.delete('/:id', deleteContactById);
