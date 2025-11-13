@@ -25,6 +25,7 @@ export default function RoleManagement() {
     bookingManagement: 0,
     blogManagement: 0,
     contactUsManagement: 0,
+    suggestionsManagement: 0,
     backendUserManagement: 0,
     roleAndPermissionManagement: 0,
   });
@@ -111,6 +112,7 @@ export default function RoleManagement() {
       { name: "Booking", selector: (r) => permissionLabels[r.bookingManagement] },
       { name: "Blog", selector: (r) => permissionLabels[r.blogManagement] },
       { name: "Contact", selector: (r) => permissionLabels[r.contactUsManagement] },
+      { name: "Suggestions", selector: (r) => permissionLabels[r.suggestionsManagement] },
       {
         name: "Backend User",
         selector: (r) => permissionLabels[r.backendUserManagement],
@@ -133,6 +135,7 @@ export default function RoleManagement() {
                 bookingManagement: row.bookingManagement,
                 blogManagement: row.blogManagement,
                 contactUsManagement: row.contactUsManagement,
+                suggestionsManagement: row.suggestionsManagement,
                 backendUserManagement: row.backendUserManagement,
                 roleAndPermissionManagement: row.roleAndPermissionManagement,
               });
@@ -164,6 +167,7 @@ export default function RoleManagement() {
                 bookingManagement: 0,
                 blogManagement: 0,
                 contactUsManagement: 0,
+                suggestionsManagement: 0,
                 backendUserManagement: 0,
                 roleAndPermissionManagement: 0,
               });
@@ -271,6 +275,7 @@ export default function RoleManagement() {
                     "bookingManagement",
                     "blogManagement",
                     "contactUsManagement",
+                    "suggestionsManagement",
                     "backendUserManagement",
                     "roleAndPermissionManagement",
                   ].map((field) => (
@@ -385,6 +390,7 @@ const ViewRole = ({ role }) => (
     <p><strong>Booking Management:</strong> {role?.bookingManagement}</p>
     <p><strong>Blog Management:</strong> {role?.blogManagement}</p>
     <p><strong>Contact Us Management:</strong> {role?.contactUsManagement}</p>
+    <p><strong>Suggestions Management:</strong> {role?.suggestionsManagement}</p>
     <p><strong>Backend User Management:</strong> {role?.backendUserManagement}</p>
     <p><strong>Role & Permission Management:</strong> {role?.roleAndPermissionManagement}</p>
   </div>

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useSelector } from "react-redux";
+import { createPortal } from "react-dom";
 
 export default function ServiceManagement() {
   const [services, setServices] = useState([]);
@@ -238,58 +239,93 @@ const RowActions = ({
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
 
-  const toggleMenu = (e) => {
+  const handleToggle = (e) => {
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
+
+    const dropdownHeight = 160; // approx height of dropdown
+    let top = rect.bottom + window.scrollY + 8;
+
+    // If dropdown goes off-screen → open upward
+    if (top + dropdownHeight > window.innerHeight + window.scrollY) {
+      top = rect.top + window.scrollY - dropdownHeight - 8;
+    }
+
     setMenuPos({
-      top: rect.bottom + window.scrollY + 5,
-      left: Math.min(rect.left + window.scrollX - 120, window.innerWidth - 180),
+      top,
+      left: Math.min(
+        rect.left + window.scrollX - 120,
+        window.innerWidth - 200
+      ),
     });
+
     setOpen((prev) => !prev);
   };
 
+  // Close dropdown on outside click or scroll
   useEffect(() => {
+    if (!open) return;
+
     const close = () => setOpen(false);
-    if (open) document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
+    window.addEventListener("click", close);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+
+    return () => {
+      window.removeEventListener("click", close);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
   }, [open]);
 
-  const canView = permissionLevel >= 1;
-  const canEdit = permissionLevel >= 2;
-  const canDelete = permissionLevel >= 3;
-  const canToggle = permissionLevel >= 4;
+  const dropdown = open ? (
+    <div
+      className="fixed bg-white border rounded-lg shadow-xl z-[2147483647] w-44 py-1 animate-fade"
+      style={{ top: menuPos.top, left: menuPos.left }}
+    >
+      {permissionLevel >= 1 && (
+        <MenuItem icon={<Eye size={16} />} label="View" onClick={onView} />
+      )}
+
+      {permissionLevel >= 2 && (
+        <MenuItem icon={<Edit size={16} />} label="Edit" onClick={onEdit} />
+      )}
+
+      {permissionLevel >= 4 && (
+        <MenuItem
+          icon={
+            row.status ? <XCircle size={16} /> : <CheckCircle size={16} />
+          }
+          label={row.status ? "Deactivate" : "Activate"}
+          onClick={onToggleStatus}
+        />
+      )}
+
+      {permissionLevel >= 3 && (
+        <MenuItem
+          icon={<Trash2 size={16} />}
+          label="Delete"
+          danger
+          onClick={onDelete}
+        />
+      )}
+    </div>
+  ) : null;
 
   return (
     <>
       <button
-        onClick={toggleMenu}
+        onClick={handleToggle}
         className="p-1 hover:bg-gray-100 rounded-md transition"
       >
         <MoreVertical size={18} />
       </button>
 
-      {open && (
-        <div
-          className="fixed bg-white border rounded-lg shadow-lg z-[99999] w-44 py-1"
-          style={{ top: menuPos.top, left: menuPos.left }}
-        >
-          {canView && <MenuItem icon={<Eye size={16} />} label="View" onClick={onView} />}
-          {canEdit && <MenuItem icon={<Edit size={16} />} label="Edit" onClick={onEdit} />}
-          {canToggle && (
-            <MenuItem
-              icon={row.status ? <XCircle size={16} /> : <CheckCircle size={16} />}
-              label={row.status ? "Deactivate" : "Activate"}
-              onClick={onToggleStatus}
-            />
-          )}
-          {canDelete && (
-            <MenuItem icon={<Trash2 size={16} />} label="Delete" onClick={onDelete} danger />
-          )}
-        </div>
-      )}
+      {createPortal(dropdown, document.body)}
     </>
   );
 };
+
 
 const MenuItem = ({ icon, label, onClick, danger }) => (
   <button

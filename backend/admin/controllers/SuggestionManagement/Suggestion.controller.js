@@ -53,18 +53,48 @@ const createSuggestion = async (req, res) => {
  */
 const getAllSuggestions = async (req, res) => {
     try {
-        const suggestions = await Suggestion.find().sort({ createdAt: -1 });
+        const { name, email, topic, search } = req.body;
+
+        const filters = {};
+
+        // 🟢 Field-wise regex filtering
+        if (name) {
+            filters.name = { $regex: name.trim(), $options: "i" };
+        }
+
+        if (email) {
+            filters.email = { $regex: email.trim(), $options: "i" };
+        }
+
+        if (topic) {
+            filters.topic = { $regex: topic.trim(), $options: "i" };
+        }
+
+        // 🟢 Global search across multiple fields
+        if (search) {
+            filters.$or = [
+                { name: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } },
+                { topic: { $regex: search, $options: "i" } },
+            ];
+        }
+
+        // Fetch sorted results
+        const suggestions = await Suggestion.find(filters)
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
             message: 'Suggestions fetched successfully',
+            total: suggestions.length,
             suggestions
         });
+
     } catch (error) {
-        console.error('Error fetching suggestions:', error);
+        console.error("Error fetching suggestions:", error);
         res.status(500).json({
             success: false,
-            message: 'Server error while fetching suggestions'
+            message: "Server error while fetching suggestions"
         });
     }
 };

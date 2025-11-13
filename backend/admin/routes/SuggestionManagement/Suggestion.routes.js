@@ -10,7 +10,7 @@ const {
 
 
 router.post('/', createSuggestion);
-router.get('/', getAllSuggestions);
+router.post('/all', getAllSuggestions);
 router.get('/:id', getSuggestionById);
 router.patch('/:id', updateSuggestionById);
 router.delete('/:id', deleteSuggestionById);

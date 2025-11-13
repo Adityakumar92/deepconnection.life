@@ -9,6 +9,7 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronRight,
+  Lightbulb
 } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -72,7 +73,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
         },
         {
           name: "Suggestion Management",
-          icon: <MessageSquare size={18} />,
+          icon: <Lightbulb size={18} />,
           children: [{ name: "Suggestions", path: "/suggestions" }],
           view: roleAndPermission?.["suggestionsManagement"],
         },
