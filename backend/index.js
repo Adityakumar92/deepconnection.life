@@ -7,12 +7,7 @@ dotenv.config();
 
 require('./connection/database/mongodbConnect');
 
-app.use(cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-}));
-// app.options("*", cors());
+app.use(cors());
 app.use(express.json());
 
 // Import routes
