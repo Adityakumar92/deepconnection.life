@@ -10,7 +10,7 @@ const {
 
 
 router.post('/', createProgram);
-router.get('/', getAllPrograms);
+router.post('/all', getAllPrograms);
 router.get('/:id', getProgramById);
 router.patch('/:id', updateProgramById);
 router.delete('/:id', deleteProgramById);

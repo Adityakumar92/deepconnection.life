@@ -48,6 +48,10 @@ const blogSchema = new mongoose.Schema({
     tags: {
         type: [String],
         default: []
+    },
+    status : {
+        type: Boolean,
+        default: false
     }
 },{
     timestamps: true

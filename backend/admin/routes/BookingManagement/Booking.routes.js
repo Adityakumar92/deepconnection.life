@@ -10,7 +10,7 @@ const {
 
 
 router.post('/', createBooking);
-router.get('/', getAllBookings);
+router.post('/all', getAllBookings);
 router.get('/:id', getBookingById);
 router.patch('/:id', updateBookingById);
 router.delete('/:id', deleteBookingById);

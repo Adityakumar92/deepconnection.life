@@ -29,6 +29,12 @@ const roleAndPermissionSchema = new mongoose.Schema({
     enum: [0, 1, 2, 3, 4],
     required: true
   },
+  suggestionsManagement: {
+    type: Number,
+    default: 0,
+    enum: [0, 1, 2, 3, 4],
+    required: true
+  },
   backendUserManagement: {
     type: Number,
     default: 0,

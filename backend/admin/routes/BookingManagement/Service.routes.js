@@ -9,7 +9,7 @@ const {
 } = require('../../controllers/BookingManagement/Service.controller');
 
 router.post('/', createService);
-router.get('/', getAllServices);
+router.post('/all', getAllServices);
 router.get('/:id', getServiceById);
 router.patch('/:id', updateServiceById);
 router.delete('/:id', deleteServiceById);

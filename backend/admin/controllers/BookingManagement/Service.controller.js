@@ -38,22 +38,49 @@ const createService = async (req, res) => {
 };
 
 /**
- * ✅ Get all Services
+ * ✅ Get all Services (with filtering & search)
  */
 const getAllServices = async (req, res) => {
-    try {
-        const services = await Service.find().sort({ createdAt: -1 });
+  try {
+    const { status, name, search } = req.body;
 
-        res.status(200).json({
-            success: true,
-            message: 'Services fetched successfully',
-            services,
-        });
-    } catch (error) {
-        console.error('Error fetching services:', error);
-        res.status(500).json({ success: false, message: 'Server error while fetching services' });
+    const filters = {};
+
+    // 🟢 Filter by active/inactive status
+    if (status !== undefined && status !== "") {
+      filters.status = status === "true" || status === true;
     }
+
+    // 🟢 Partial match for name
+    if (name) {
+      filters.name = { $regex: name.trim(), $options: "i" };
+    }
+
+    // 🟢 Global search — matches across fields
+    if (search) {
+      filters.$or = [
+        { name: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 🟢 Fetch and sort by newest first
+    const services = await Service.find(filters).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Services fetched successfully",
+      total: services.length,
+      services,
+    });
+  } catch (error) {
+    console.error("Error fetching services:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching services",
+    });
+  }
 };
+
 
 /**
  * ✅ Get a single Service by ID

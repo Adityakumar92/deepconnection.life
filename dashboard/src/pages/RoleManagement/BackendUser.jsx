@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
+import { useSelector } from "react-redux";
 
 export default function BackendUser() {
   const [users, setUsers] = useState([]);
@@ -27,6 +28,9 @@ export default function BackendUser() {
     password: "",
     roleId: "",
   });
+
+  const { roleAndPermission } = useSelector((state) => state.auth);
+  const permissionLevel = roleAndPermission?.["backendUserManagement"] || 0;
 
   /* --------------------------- API CALLS --------------------------- */
 
@@ -123,7 +127,6 @@ export default function BackendUser() {
   };
 
   /* --------------------------- TABLE CONFIG --------------------------- */
-
   const columns = useMemo(
     () => [
       { name: "Name", selector: (row) => row.name, sortable: true },
@@ -152,6 +155,7 @@ export default function BackendUser() {
         cell: (row) => (
           <RowActions
             row={row}
+            permissionLevel={permissionLevel}
             onView={() => setModal({ type: "view", data: row })}
             onEdit={() => {
               setFormData({
@@ -169,38 +173,40 @@ export default function BackendUser() {
         ignoreRowClick: true,
       },
     ],
-    []
+    [permissionLevel]
   );
 
   /* --------------------------- RENDER --------------------------- */
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center bg-gradient-to-r from-indigo-500 to-purple-500 p-5 rounded-xl shadow-md text-white">
         <h1 className="text-xl font-semibold">Backend Users</h1>
-        <button
-          onClick={() => {
-            setFormData({
-              name: "",
-              email: "",
-              phone: "",
-              password: "",
-              roleId: "",
-            });
-            setModal({ type: "create", data: null });
-          }}
-          className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition"
-        >
-          <Plus size={18} /> Create User
-        </button>
+
+        {/* ✅ Only show Create User if permissionLevel >= 2 */}
+        {permissionLevel >= 2 && (
+          <button
+            onClick={() => {
+              setFormData({
+                name: "",
+                email: "",
+                phone: "",
+                password: "",
+                roleId: "",
+              });
+              setModal({ type: "create", data: null });
+            }}
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition"
+          >
+            <Plus size={18} /> Create User
+          </button>
+        )}
       </div>
 
       {/* Filters */}
       <div className="bg-white border rounded-lg shadow-sm p-4 flex flex-wrap items-center gap-3">
         <div className="text-sm font-medium text-gray-600">Filters:</div>
 
-        {/* Name Filter */}
         <div className="relative w-full md:w-1/3">
           <input
             type="text"
@@ -212,7 +218,6 @@ export default function BackendUser() {
           <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
         </div>
 
-        {/* Role Filter */}
         <select
           value={filters.role}
           onChange={(e) => setFilters({ ...filters, role: e.target.value })}
@@ -226,7 +231,6 @@ export default function BackendUser() {
           ))}
         </select>
 
-        {/* Status Filter */}
         <select
           value={filters.block}
           onChange={(e) => setFilters({ ...filters, block: e.target.value })}
@@ -237,7 +241,6 @@ export default function BackendUser() {
           <option value="false">Active</option>
         </select>
 
-        {/* Clear Filters */}
         {(filters.name || filters.role || filters.block) && (
           <button
             onClick={() => setFilters({ name: "", role: "", block: "" })}
@@ -275,8 +278,6 @@ export default function BackendUser() {
 }
 
 /* --------------------------- COMPONENTS --------------------------- */
-
-// ✅ Modal (Create / Edit / View)
 const UserModal = ({
   modal,
   setModal,
@@ -395,7 +396,6 @@ const UserModal = ({
   </Transition>
 );
 
-// ✅ View User (Modal Content)
 const ViewUser = ({ user }) => (
   <div className="space-y-3 text-gray-700">
     <p><strong>Name:</strong> {user?.name}</p>
@@ -415,8 +415,8 @@ const ViewUser = ({ user }) => (
   </div>
 );
 
-// ✅ Row Actions Dropdown
-const RowActions = ({ row, onView, onEdit, onBlock, onDelete }) => {
+/* --------------------------- ROW ACTIONS --------------------------- */
+const RowActions = ({ row, permissionLevel, onView, onEdit, onBlock, onDelete }) => {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
 
@@ -436,6 +436,11 @@ const RowActions = ({ row, onView, onEdit, onBlock, onDelete }) => {
     return () => document.removeEventListener("click", close);
   }, [open]);
 
+  const canView = permissionLevel >= 1;
+  const canEdit = permissionLevel >= 2;
+  const canDelete = permissionLevel >= 3;
+  const canBlock = permissionLevel >= 4;
+
   return (
     <>
       <button
@@ -451,26 +456,29 @@ const RowActions = ({ row, onView, onEdit, onBlock, onDelete }) => {
           className="fixed bg-white border rounded-lg shadow-lg z-[99999] w-44 py-1 animate-fadeIn"
           style={{ top: menuPos.top, left: menuPos.left }}
         >
-          <MenuItem icon={<Eye size={16} />} label="View" onClick={onView} />
-          <MenuItem icon={<Edit size={16} />} label="Edit" onClick={onEdit} />
-          <MenuItem
-            icon={<Ban size={16} />}
-            label={row.block ? "Unblock" : "Block"}
-            onClick={onBlock}
-          />
-          <MenuItem
-            icon={<Trash2 size={16} />}
-            label="Delete"
-            onClick={onDelete}
-            danger
-          />
+          {canView && <MenuItem icon={<Eye size={16} />} label="View" onClick={onView} />}
+          {canEdit && <MenuItem icon={<Edit size={16} />} label="Edit" onClick={onEdit} />}
+          {canBlock && (
+            <MenuItem
+              icon={<Ban size={16} />}
+              label={row.block ? "Unblock" : "Block"}
+              onClick={onBlock}
+            />
+          )}
+          {canDelete && (
+            <MenuItem
+              icon={<Trash2 size={16} />}
+              label="Delete"
+              onClick={onDelete}
+              danger
+            />
+          )}
         </div>
       )}
     </>
   );
 };
 
-// ✅ Menu Item Helper
 const MenuItem = ({ icon, label, onClick, danger = false }) => (
   <button
     onClick={onClick}

@@ -10,10 +10,12 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function SideBar({ sidebarOpen, setSidebarOpen }) {
   const [role, setRole] = useState("Admin");
   const [openDropdowns, setOpenDropdowns] = useState({});
+  const { roleAndPermission } = useSelector((state) => state.auth);
 
   useEffect(() => {
     try {
@@ -27,7 +29,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
     }
   }, []);
 
-  // ✅ Sidebar menu config
+  // ✅ Sidebar menu configuration
   const menuItems = [
     {
       title: "Main",
@@ -36,6 +38,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
           name: "Dashboard",
           icon: <LayoutDashboard size={18} />,
           path: "/dashboard",
+          view: roleAndPermission?.["dashboard"],
         },
       ],
     },
@@ -50,11 +53,13 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
             { name: "Programs", path: "/programs" },
             { name: "Services", path: "/services" },
           ],
+          view: roleAndPermission?.["bookingManagement"],
         },
         {
           name: "Blog Management",
           icon: <BookOpen size={18} />,
           children: [{ name: "Blogs", path: "/blogs" }],
+          view: roleAndPermission?.["blogManagement"],
         },
         {
           name: "Contact Management",
@@ -63,11 +68,13 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
             { name: "Contacts", path: "/contacts" },
             { name: "Child Issues", path: "/child-issues" },
           ],
+          view: roleAndPermission?.["contactUsManagement"],
         },
         {
           name: "Suggestion Management",
           icon: <MessageSquare size={18} />,
           children: [{ name: "Suggestions", path: "/suggestions" }],
+          view: roleAndPermission?.["suggestionsManagement"],
         },
       ],
     },
@@ -78,17 +85,19 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
           name: "Role & Permission",
           icon: <Settings size={18} />,
           path: "/roles",
+          view: roleAndPermission?.["roleAndPermissionManagement"],
         },
         {
           name: "Backend Users",
           icon: <Users size={18} />,
           path: "/backendUsers",
+          view: roleAndPermission?.["backendUserManagement"],
         },
       ],
     },
   ];
 
-  // ✅ Dropdown toggle logic
+  // ✅ Toggle dropdowns
   const toggleDropdown = (menuName) => {
     setOpenDropdowns((prev) => ({
       ...prev,
@@ -96,9 +105,15 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
     }));
   };
 
+  // ✅ Filter visible items (only if view !== 0)
+  const filteredMenu = menuItems.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => item.view && item.view !== 0),
+  }));
+
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 md:hidden"
@@ -106,7 +121,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
         ></div>
       )}
 
-      {/* Sidebar container */}
+      {/* Sidebar Container */}
       <aside
         className={`fixed md:static z-40 bg-white shadow-md w-64 min-h-full flex flex-col transform transition-transform duration-200 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -119,7 +134,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
 
         {/* Navigation */}
         <div className="flex-1 p-4 space-y-6 overflow-y-auto custom-scrollbar">
-          {menuItems.map((section, sectionIdx) => (
+          {filteredMenu.map((section, sectionIdx) => (
             <div key={sectionIdx}>
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 {section.title}
@@ -132,7 +147,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
 
                   return (
                     <div key={idx}>
-                      {/* ✅ Parent item */}
+                      {/* Parent item */}
                       {hasChildren ? (
                         <div
                           onClick={() => toggleDropdown(item.name)}
@@ -153,7 +168,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
                           )}
                         </div>
                       ) : (
-                        /* ✅ Direct navigation item */
+                        /* Direct item */
                         <NavLink
                           to={item.path}
                           onClick={() => setSidebarOpen(false)}
@@ -170,7 +185,7 @@ export default function SideBar({ sidebarOpen, setSidebarOpen }) {
                         </NavLink>
                       )}
 
-                      {/* ✅ Dropdown children */}
+                      {/* Dropdown Children */}
                       {hasChildren && isOpen && (
                         <div className="ml-10 mt-1 space-y-1 border-l border-gray-200 pl-3">
                           {item.children.map((child, cIdx) => (

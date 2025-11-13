@@ -5,6 +5,10 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import BackendUser from "../pages/RoleManagement/BackendUser";
 import RoleManagement from "../pages/RoleManagement/RoleMAnagement.jsx";
 import Login from "../pages/Login/Login";
+import BlogManagement from "../pages/BlogManagement/BlogManagement.jsx";
+import ProgramManagement from "../pages/BookingManagement/ProgramManagement.jsx";
+import ServiceManagement from "../pages/BookingManagement/ServiceManagement.jsx";
+import BookingManagement from "../pages/BookingManagement/BookingManagement.jsx";
 
 const router = createBrowserRouter([
     // ✅ Root route decides where to go
@@ -26,19 +30,19 @@ const router = createBrowserRouter([
             },
             {
                 path: 'blogs/',
-                element: <Dashboard />
+                element: <BlogManagement />
             },
             {
                 path: 'bookings/',
-                element: <Dashboard />
+                element: <BookingManagement />
             },
             {
                 path: 'programs/',
-                element: <Dashboard />
+                element: <ProgramManagement />
             },
             {
                 path: 'services/',
-                element: <Dashboard />
+                element: <ServiceManagement />
             },
             {
                 path: 'contacts/',

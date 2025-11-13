@@ -15,7 +15,8 @@ const createBlog = async (req, res) => {
             authorPosition,
             readTime,
             image,
-            tags
+            tags,
+            status
         } = req.body;
 
         // Validation
@@ -37,7 +38,8 @@ const createBlog = async (req, res) => {
             authorPosition: authorPosition.trim(),
             readTime: readTime.trim(),
             image: image?.trim() || null,
-            tags: tags || []
+            tags: tags || [],
+            status: status || false
         });
 
         const savedBlog = await newBlog.save();
@@ -60,30 +62,81 @@ const createBlog = async (req, res) => {
  * ✅ Get all Blogs
  */
 const getAllBlogs = async (req, res) => {
-    try {
-        const { status, category, search } = req.query;
+  try {
+    const {
+      status,               // approval flag (true/false)
+      category,
+      contentType,
+      title,
+      publicationStatus,
+      authorName,
+      tags,
+      search,
+    } = req.body;
 
-        const filters = {};
-        if (status) filters.publicationStatus = status;
-        if (category) filters.category = category;
-        if (search) filters.$text = { $search: search };
+    const filters = {};
 
-        const blogs = await Blog.find(filters).sort({ createdAt: -1 });
-
-        res.status(200).json({
-            success: true,
-            message: 'Blogs fetched successfully',
-            total: blogs.length,
-            blogs
-        });
-    } catch (error) {
-        console.error('Error fetching blogs:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while fetching blogs'
-        });
+    // 🟢 Direct field filters
+    if (status !== undefined) {
+      filters.status = status === "true"; // convert string to boolean
     }
+
+    if (publicationStatus) {
+      filters.publicationStatus = publicationStatus.trim();
+    }
+
+    if (contentType) {
+      filters.contentType = { $regex: contentType, $options: "i" };
+    }
+
+    if (category) {
+      filters.category = { $regex: category, $options: "i" };
+    }
+
+    if (title) {
+      filters.title = { $regex: title, $options: "i" };
+    }
+
+    if (authorName) {
+      filters.authorName = { $regex: authorName, $options: "i" };
+    }
+
+    if (tags) {
+      // match any of provided tags (comma-separated)
+      const tagArray = tags.split(",").map((t) => t.trim());
+      filters.tags = { $in: tagArray };
+    }
+
+    // 🟢 General search — matches across multiple fields
+    if (search) {
+      filters.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { content: { $regex: search, $options: "i" } },
+        { category: { $regex: search, $options: "i" } },
+        { authorName: { $regex: search, $options: "i" } },
+        { authorPosition: { $regex: search, $options: "i" } },
+        { tags: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 🟢 Fetch and sort by newest first
+    const blogs = await Blog.find(filters).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Blogs fetched successfully",
+      total: blogs.length,
+      blogs,
+    });
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching blogs",
+    });
+  }
 };
+
 
 /**
  * ✅ Get Blog by ID
@@ -114,6 +167,32 @@ const getBlogById = async (req, res) => {
     }
 };
 
+const updateBlogStatusById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const blog = await Blog.findById(id);
+        if (!blog) {
+            return res.status(404).json({
+                success: false,
+                message: 'Blog not found'
+            });
+        }
+        blog.status = !blog.status;
+        const updatedBlog = await blog.save();
+        res.status(200).json({
+            success: true,
+            message: 'Blog status updated successfully',
+            blog: updatedBlog
+        });
+    } catch (error) {
+        console.error('Error updating blog status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while updating blog status'
+        });
+    }
+};
+
 /**
  * ✅ Update Blog by ID
  */
@@ -130,7 +209,8 @@ const updateBlogById = async (req, res) => {
             authorPosition,
             readTime,
             image,
-            tags
+            tags,
+            status
         } = req.body;
 
         const existingBlog = await Blog.findById(id);
@@ -151,6 +231,7 @@ const updateBlogById = async (req, res) => {
         existingBlog.readTime = readTime?.trim() || existingBlog.readTime;
         existingBlog.image = image?.trim() || existingBlog.image;
         existingBlog.tags = tags || existingBlog.tags;
+        existingBlog.status = status !== undefined ? status : existingBlog.status;
 
         const updatedBlog = await existingBlog.save();
 
@@ -202,6 +283,7 @@ module.exports = {
     createBlog,
     getAllBlogs,
     getBlogById,
+    updateBlogStatusById,
     updateBlogById,
     deleteBlogById
 };

@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { Dialog, Transition } from "@headlessui/react";
+import { useSelector } from "react-redux";
 
 export default function RoleManagement() {
   const [roles, setRoles] = useState([]);
@@ -27,6 +28,11 @@ export default function RoleManagement() {
     backendUserManagement: 0,
     roleAndPermissionManagement: 0,
   });
+
+  const { roleAndPermission } = useSelector((state) => state.auth);
+
+  // Current user permission level for Role Management
+  const permissionLevel = roleAndPermission?.["roleAndPermissionManagement"] || 0;
 
   const permissionLabels = {
     0: "None",
@@ -55,7 +61,6 @@ export default function RoleManagement() {
     fetchRoles();
   }, []);
 
-  // Debounce search filter
   useEffect(() => {
     const delay = setTimeout(fetchRoles, 500);
     return () => clearTimeout(delay);
@@ -119,6 +124,7 @@ export default function RoleManagement() {
         cell: (row) => (
           <RowActions
             row={row}
+            permissionLevel={permissionLevel}
             onView={() => setModal({ type: "view", data: row })}
             onEdit={() => {
               setFormData({
@@ -138,7 +144,7 @@ export default function RoleManagement() {
         ignoreRowClick: true,
       },
     ],
-    []
+    [permissionLevel]
   );
 
   /* --------------------------- Render --------------------------- */
@@ -147,23 +153,27 @@ export default function RoleManagement() {
       {/* Header */}
       <div className="flex justify-between items-center bg-gradient-to-r from-indigo-500 to-purple-500 p-5 rounded-xl shadow-md text-white">
         <h1 className="text-xl font-semibold">Role & Permission Management</h1>
-        <button
-          onClick={() => {
-            setFormData({
-              role: "",
-              dashboard: 0,
-              bookingManagement: 0,
-              blogManagement: 0,
-              contactUsManagement: 0,
-              backendUserManagement: 0,
-              roleAndPermissionManagement: 0,
-            });
-            setModal({ type: "create", data: null });
-          }}
-          className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition"
-        >
-          <Plus size={18} /> Create Role
-        </button>
+
+        {/* ✅ Only show "Create Role" if permissionLevel ≥ 2 */}
+        {permissionLevel >= 2 && (
+          <button
+            onClick={() => {
+              setFormData({
+                role: "",
+                dashboard: 0,
+                bookingManagement: 0,
+                blogManagement: 0,
+                contactUsManagement: 0,
+                backendUserManagement: 0,
+                roleAndPermissionManagement: 0,
+              });
+              setModal({ type: "create", data: null });
+            }}
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition"
+          >
+            <Plus size={18} /> Create Role
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -304,9 +314,8 @@ export default function RoleManagement() {
   );
 }
 
-/* --------------------------- Helper Components --------------------------- */
-
-const RowActions = ({ row, onView, onEdit, onDelete }) => {
+/* --------------------------- Row Actions --------------------------- */
+const RowActions = ({ permissionLevel, onView, onEdit, onDelete }) => {
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
 
@@ -326,6 +335,11 @@ const RowActions = ({ row, onView, onEdit, onDelete }) => {
     return () => document.removeEventListener("click", close);
   }, [open]);
 
+  // Determine allowed actions
+  const canView = permissionLevel >= 1;
+  const canEdit = permissionLevel >= 2;
+  const canDelete = permissionLevel >= 3;
+
   return (
     <>
       <button onClick={toggleMenu} className="p-1 hover:bg-gray-100 rounded-md">
@@ -337,14 +351,16 @@ const RowActions = ({ row, onView, onEdit, onDelete }) => {
           className="fixed bg-white border rounded-lg shadow-lg z-[99999] w-44 py-1"
           style={{ top: menuPos.top, left: menuPos.left }}
         >
-          <MenuItem icon={<Eye size={16} />} label="View" onClick={onView} />
-          <MenuItem icon={<Edit size={16} />} label="Edit" onClick={onEdit} />
-          <MenuItem
-            icon={<Trash2 size={16} />}
-            label="Delete"
-            onClick={onDelete}
-            danger
-          />
+          {canView && <MenuItem icon={<Eye size={16} />} label="View" onClick={onView} />}
+          {canEdit && <MenuItem icon={<Edit size={16} />} label="Edit" onClick={onEdit} />}
+          {canDelete && (
+            <MenuItem
+              icon={<Trash2 size={16} />}
+              label="Delete"
+              onClick={onDelete}
+              danger
+            />
+          )}
         </div>
       )}
     </>
